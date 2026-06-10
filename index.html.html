@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard ข้อมูลทั่วไป รพ.สต.บ้านคำใหญ่</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --bg:#eef7f4; --card:#ffffff; --ink:#14352d; --muted:#64756f; --primary:#0f9f7a; --primary2:#12b886;
+      --blue:#3182ce; --orange:#f59f00; --red:#e03131; --purple:#7048e8; --shadow:0 16px 40px rgba(15,70,55,.12);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Sarabun',sans-serif;background:linear-gradient(135deg,#e8fff7 0%,#f4fbff 48%,#fff9e8 100%);color:var(--ink)}
+    .app{max-width:1440px;margin:auto;padding:22px}
+    .hero{position:relative;overflow:hidden;border-radius:32px;padding:30px;background:linear-gradient(135deg,#087f5b,#12b886 55%,#4dabf7);box-shadow:var(--shadow);color:white}
+    .hero:after{content:"";position:absolute;right:-80px;top:-100px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.18)}
+    .hero h1{margin:0;font-size:clamp(1.55rem,3vw,3rem);font-weight:800;line-height:1.25}.hero p{margin:8px 0 0;font-size:1.05rem;opacity:.95}.badge{display:inline-flex;gap:8px;align-items:center;background:rgba(255,255,255,.18);padding:8px 14px;border:1px solid rgba(255,255,255,.28);border-radius:999px;margin-bottom:12px;font-weight:700}
+    .grid{display:grid;gap:18px}.kpi{grid-template-columns:repeat(6,minmax(150px,1fr));margin-top:18px}.card{background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.75);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+    .metric .label{color:var(--muted);font-weight:700;font-size:.92rem}.metric .value{font-size:2rem;font-weight:800;margin-top:4px}.metric .sub{font-size:.84rem;color:var(--muted)}
+    .charts{grid-template-columns:1.15fr .85fr;margin-top:18px}.charts3{grid-template-columns:repeat(3,1fr);margin-top:18px}.section-title{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.section-title h2{font-size:1.18rem;margin:0}.section-title small{color:var(--muted);font-weight:600}
+    canvas{width:100%!important;max-height:390px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.toolbar input,.toolbar select{border:1px solid #d7ebe4;background:white;border-radius:14px;padding:12px 14px;font-family:inherit;font-size:1rem;outline:none}.toolbar input{flex:1;min-width:230px}.toolbar select{min-width:180px}
+    .table-wrap{overflow:auto;border-radius:18px;border:1px solid #e1eee9}table{border-collapse:collapse;width:100%;min-width:1050px;background:white}th,td{padding:12px 13px;border-bottom:1px solid #edf4f1;text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:inherit}th{background:#e7f7f1;color:#17463b;font-weight:800;position:sticky;top:0;z-index:2}tbody tr:hover{background:#f6fffb}.pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#e6fcf5;color:#087f5b;font-weight:800;font-size:.82rem}.footer{color:var(--muted);text-align:center;margin:24px 0 4px;font-size:.9rem}
+    .insight{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.insight .mini{background:#f7fffc;border:1px dashed #b7ead8;border-radius:18px;padding:14px}.mini b{display:block;font-size:1.15rem}.mini span{color:var(--muted);font-size:.9rem}
+    @media(max-width:1100px){.kpi{grid-template-columns:repeat(3,1fr)}.charts,.charts3,.insight{grid-template-columns:1fr 1fr}}@media(max-width:700px){.app{padding:12px}.hero{padding:22px;border-radius:24px}.kpi,.charts,.charts3,.insight{grid-template-columns:1fr}.metric .value{font-size:1.65rem}.card{padding:14px}table{min-width:950px}}
+    @media print{body{background:white}.toolbar{display:none}.card,.hero{box-shadow:none}.app{max-width:none}.hero{break-inside:avoid}.card{break-inside:avoid}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div class="badge">🏥 KUMYAI COMMUNITY HEALTH DATA</div>
+    <h1>Dashboard ข้อมูลทั่วไป<br>โรงพยาบาลส่งเสริมสุขภาพตำบลบ้านคำใหญ่</h1>
+    <p>จากการสำรวจของ อสม. ณ วันที่ 10 มิถุนายน 2569 เวลา 11.00 น. | ครอบคลุม 12 หมู่บ้าน</p>
+  </header>
+
+  <section class="grid kpi">
+    <div class="card metric"><div class="label">ประชากรรวม</div><div class="value" id="kPop">5,834</div><div class="sub">คน</div></div>
+    <div class="card metric"><div class="label">หลังคาเรือน</div><div class="value" id="kHouse">1,708</div><div class="sub">หลัง</div></div>
+    <div class="card metric"><div class="label">ชาย</div><div class="value">2,915</div><div class="sub">49.97%</div></div>
+    <div class="card metric"><div class="label">หญิง</div><div class="value">2,919</div><div class="sub">50.03%</div></div>
+    <div class="card metric"><div class="label">ผู้สูงอายุ 60+</div><div class="value">1,334</div><div class="sub">22.87% ของประชากร</div></div>
+    <div class="card metric"><div class="label">อยู่จริงตามทะเบียน</div><div class="value">4,698</div><div class="sub">80.53%</div></div>
+  </section>
+
+  <section class="grid charts">
+    <div class="card"><div class="section-title"><h2>📊 ประชากรรวมรายหมู่บ้าน</h2><small>คน</small></div><canvas id="popChart"></canvas></div>
+    <div class="card"><div class="section-title"><h2>🏡 สถานะการอยู่อาศัยรวมทั้งตำบล</h2><small>รวม 5,834 คน</small></div><canvas id="resChart"></canvas></div>
+  </section>
+
+  <section class="grid charts3">
+    <div class="card"><div class="section-title"><h2>👥 โครงสร้างอายุรวม</h2><small>5 กลุ่มวัย</small></div><canvas id="ageChart"></canvas></div>
+    <div class="card"><div class="section-title"><h2>⚖️ ชาย–หญิง รายหมู่บ้าน</h2><small>คน</small></div><canvas id="sexChart"></canvas></div>
+    <div class="card"><div class="section-title"><h2>🗺️ เขตพื้นที่หลังคาเรือน</h2><small>เทศบาล / อบต. / ยังไม่ระบุ</small></div><canvas id="areaChart"></canvas></div>
+  </section>
+
+  <section class="card" style="margin-top:18px">
+    <div class="section-title"><h2>🔎 วิเคราะห์เร็วเพื่อการบริหารจัดการ</h2><small>Key Insights</small></div>
+    <div class="insight">
+      <div class="mini"><b>หมู่ 5 และ หมู่ 11</b><span>มีประชากรมากที่สุด 795 คนเท่ากัน ควรเป็นพื้นที่หลักของการจัดบริการเชิงรุก</span></div>
+      <div class="mini"><b>ผู้สูงอายุ 22.87%</b><span>เข้าสู่สังคมสูงวัยระดับตำบล เหมาะต่อการเชื่อม LTC/NCD/Home visit</span></div>
+      <div class="mini"><b>ตัวไม่อยู่ 1,080 คน</b><span>คิดเป็น 18.51% ต้องจัดการฐานทะเบียนเพื่อความแม่นยำของเป้าหมายบริการ</span></div>
+      <div class="mini"><b>ยังไม่ระบุเขต 381 หลัง</b><span>ควรเร่งปรับเขตพื้นที่ เพื่อแยกงบประมาณและความรับผิดชอบเทศบาล/อบต.</span></div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:18px">
+    <div class="section-title"><h2>📋 ตารางข้อมูลรายหมู่บ้าน</h2><small>ค้นหาและกรองได้</small></div>
+    <div class="toolbar">
+      <input id="search" placeholder="ค้นหาชื่อหมู่บ้าน เช่น ห้วยยาง / หมู่ 11" />
+      <select id="sortBy">
+        <option value="villageNo">เรียงตามหมู่บ้าน</option>
+        <option value="population">ประชากรมากไปน้อย</option>
+        <option value="households">หลังคาเรือนมากไปน้อย</option>
+        <option value="elderly">ผู้สูงอายุมากไปน้อย</option>
+        <option value="working">วัยทำงานมากไปน้อย</option>
+      </select>
+    </div>
+    <div class="table-wrap"><table id="dataTable"></table></div>
+  </section>
+  <div class="footer">จัดทำเพื่อสนับสนุนการวางแผนบริการสุขภาพปฐมภูมิ • รพ.สต.บ้านคำใหญ่ • อสม.ตำบลคำใหญ่</div>
+</div>
+<script>
+const villages = [
+{no:1,name:'หมู่ 1 บ้านหัวสนาม',pop:222,type1:195,type2:26,type3:0,moved:1,house:86,mun:0,sub:86,unk:0,male:121,female:101,early:4,school:11,teen:15,work:152,elder:40},
+{no:2,name:'หมู่ 2 บ้านคำเจริญ',pop:754,type1:676,type2:72,type3:5,moved:1,house:218,mun:218,sub:0,unk:0,male:386,female:368,early:9,school:52,teen:61,work:448,elder:184},
+{no:3,name:'หมู่ 3 บ้านชัยศรี',pop:614,type1:529,type2:78,type3:1,moved:6,house:198,mun:148,sub:0,unk:50,male:293,female:321,early:16,school:49,teen:58,work:370,elder:121},
+{no:4,name:'หมู่ 4 บ้านนาดี',pop:504,type1:402,type2:90,type3:12,moved:0,house:138,mun:2,sub:136,unk:0,male:253,female:251,early:20,school:32,teen:42,work:289,elder:121},
+{no:5,name:'หมู่ 5 บ้านห้วยยาง',pop:795,type1:618,type2:164,type3:7,moved:6,house:245,mun:1,sub:244,unk:0,male:379,female:416,early:13,school:47,teen:49,work:481,elder:205},
+{no:6,name:'หมู่ 6 บ้านห้วยม่วง',pop:223,type1:199,type2:23,type3:1,moved:0,house:80,mun:4,sub:76,unk:0,male:114,female:109,early:4,school:13,teen:18,work:137,elder:51},
+{no:7,name:'หมู่ 7 บ้านคำใหญ่',pop:546,type1:422,type2:124,type3:0,moved:0,house:135,mun:16,sub:0,unk:119,male:289,female:257,early:10,school:45,teen:55,work:322,elder:114},
+{no:8,name:'หมู่ 8 บ้านคำถาวร',pop:178,type1:145,type2:32,type3:1,moved:0,house:50,mun:0,sub:10,unk:40,male:94,female:84,early:3,school:9,teen:16,work:115,elder:35},
+{no:9,name:'หมู่ 9 บ้านโพธิ์ทอง',pop:380,type1:256,type2:122,type3:0,moved:2,house:100,mun:3,sub:3,unk:94,male:183,female:197,early:6,school:26,teen:36,work:227,elder:85},
+{no:10,name:'หมู่ 10 บ้านโคกป่ากุง',pop:366,type1:296,type2:69,type3:1,moved:0,house:94,mun:8,sub:8,unk:78,male:178,female:188,early:13,school:34,teen:28,work:224,elder:67},
+{no:11,name:'หมู่ 11 บ้านคำใหญ่',pop:795,type1:640,type2:150,type3:3,moved:2,house:218,mun:210,sub:8,unk:0,male:411,female:384,early:24,school:39,teen:64,work:468,elder:200},
+{no:12,name:'หมู่ 12 บ้านคำเจริญ',pop:457,type1:320,type2:130,type3:6,moved:1,house:146,mun:146,sub:0,unk:0,male:214,female:243,early:18,school:21,teen:37,work:270,elder:111}
+];
+const fmt = n => n.toLocaleString('th-TH');
+const labels = villages.map(v=>v.name.replace('หมู่ ', 'ม.'));
+Chart.defaults.font.family = 'Sarabun'; Chart.defaults.color = '#14352d';
+new Chart(document.getElementById('popChart'),{type:'bar',data:{labels,datasets:[{label:'ประชากร',data:villages.map(v=>v.pop),borderRadius:12}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+new Chart(document.getElementById('resChart'),{type:'doughnut',data:{labels:['มีชื่อและอยู่จริง','มีชื่อแต่ตัวไม่อยู่','ไม่มีชื่อแต่ตัวอยู่จริง','ย้ายออกนอกเขต'],datasets:[{data:[4698,1080,37,19]}]},options:{plugins:{legend:{position:'bottom'}}}});
+new Chart(document.getElementById('ageChart'),{type:'polarArea',data:{labels:['ปฐมวัย 0-5','วัยเรียน 6-12','วัยรุ่น 13-19','วัยทำงาน 20-59','ผู้สูงอายุ 60+'],datasets:[{data:[140,378,479,3503,1334]}]},options:{plugins:{legend:{position:'bottom'}}}});
+new Chart(document.getElementById('sexChart'),{type:'bar',data:{labels,datasets:[{label:'ชาย',data:villages.map(v=>v.male),borderRadius:10},{label:'หญิง',data:villages.map(v=>v.female),borderRadius:10}]},options:{responsive:true,scales:{x:{stacked:false},y:{beginAtZero:true}},plugins:{legend:{position:'bottom'}}}});
+new Chart(document.getElementById('areaChart'),{type:'bar',data:{labels,datasets:[{label:'เทศบาล',data:villages.map(v=>v.mun),borderRadius:10},{label:'อบต.',data:villages.map(v=>v.sub),borderRadius:10},{label:'ยังไม่ระบุ',data:villages.map(v=>v.unk),borderRadius:10}]},options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}},plugins:{legend:{position:'bottom'}}}});
+function renderTable(){
+  const q = document.getElementById('search').value.trim().toLowerCase(); const sort = document.getElementById('sortBy').value;
+  let rows = villages.filter(v=>v.name.toLowerCase().includes(q));
+  if(sort==='population') rows.sort((a,b)=>b.pop-a.pop); else if(sort==='households') rows.sort((a,b)=>b.house-a.house); else if(sort==='elderly') rows.sort((a,b)=>b.elder-a.elder); else if(sort==='working') rows.sort((a,b)=>b.work-a.work); else rows.sort((a,b)=>a.no-b.no);
+  const head = ['หมู่บ้าน','หลังคาเรือน','ประชากร','ชาย','หญิง','อยู่จริง','ตัวไม่อยู่','ไม่มีชื่อแต่อยู่จริง','ย้ายออก','เทศบาล','อบต.','ไม่ระบุเขต','0-5','6-12','13-19','20-59','60+'];
+  document.getElementById('dataTable').innerHTML = `<thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>` + rows.map(v=>`<tr><td><span class="pill">ม.${v.no}</span> ${v.name.replace('หมู่ '+v.no+' ','')}</td><td>${fmt(v.house)}</td><td><b>${fmt(v.pop)}</b></td><td>${fmt(v.male)}</td><td>${fmt(v.female)}</td><td>${fmt(v.type1)}</td><td>${fmt(v.type2)}</td><td>${fmt(v.type3)}</td><td>${fmt(v.moved)}</td><td>${fmt(v.mun)}</td><td>${fmt(v.sub)}</td><td>${fmt(v.unk)}</td><td>${fmt(v.early)}</td><td>${fmt(v.school)}</td><td>${fmt(v.teen)}</td><td>${fmt(v.work)}</td><td>${fmt(v.elder)}</td></tr>`).join('') + `</tbody>`;
+}
+document.getElementById('search').addEventListener('input',renderTable); document.getElementById('sortBy').addEventListener('change',renderTable); renderTable();
+</script>
+</body>
+</html>
